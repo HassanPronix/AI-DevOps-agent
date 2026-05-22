@@ -27,8 +27,16 @@ export const IncidentAnnotation = Annotation.Root({
   clusterContext: Annotation<any>(),
 
   podName: Annotation<string>(),
-  
-  namespace: Annotation<string>()
+
+  namespace: Annotation<string>(),
+
+  deployment: Annotation<string>(),
+
+  resolvedPods: Annotation<{ name: string; status?: string; restarts?: number; }[]>({
+    value: (_prev, next) => next,
+    default: () => [],
+  }),
+
 });
 
 export type IncidentState = typeof IncidentAnnotation.State;

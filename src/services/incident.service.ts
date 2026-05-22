@@ -69,7 +69,7 @@ import { storeIncident } from "../db/storeIncident";
 type IncidentInput = {
   namespace?: string;
   service?: string;
-  podName?: string;
+  deployment?: string;
 };
 export class IncidentService {
 
@@ -80,7 +80,7 @@ export class IncidentService {
     const result = await graph.invoke({
       namespace: input.service,
       service: input.service,
-      podName: input.podName
+      deployment: input.deployment
     });
 
     await storeIncident({

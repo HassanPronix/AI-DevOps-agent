@@ -10,14 +10,18 @@ import {
   reportNode,
   fetchLogsNode,
 } from "./nodes";
-import { k8sInspectionNode } from "./k8sNode";
+import { deploymentResolverNode, k8sInspectionNode, selectPodNode } from "./k8sNode";
 
 export async function buildIncidentGraph() {
   const workflow = new StateGraph(IncidentAnnotation)
 
     .addNode("parseLogs", parseLogsNode)
 
-    .addNode("fetchLogs", fetchLogsNode)
+    .addNode("resolveDeployment", deploymentResolverNode)
+
+    .addNode("selectPod", selectPodNode)
+
+    // .addNode("fetchLogs", fetchLogsNode)
 
     .addNode("k8sInspection", k8sInspectionNode)
 
@@ -29,9 +33,11 @@ export async function buildIncidentGraph() {
 
     .addNode("report", reportNode)
 
-    .addEdge(START, "fetchLogs")
+    .addEdge(START, "resolveDeployment")
 
-    .addEdge("fetchLogs", "parseLogs")
+    .addEdge("resolveDeployment", "selectPod")
+
+    .addEdge("selectPod", "parseLogs")
 
     .addEdge("parseLogs", "k8sInspection")
 
@@ -43,7 +49,7 @@ export async function buildIncidentGraph() {
 
     .addEdge("fixPlanner", "report")
 
-    .addEdge("report", END);
+    .addEdge("report", END)
 
   return workflow.compile();
 }

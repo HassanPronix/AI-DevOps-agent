@@ -3,16 +3,16 @@ import { IncidentService } from "../services/incident.service";
 
 export const analyzeIncident = async (req: Request, res: Response) => {
   try {
-    const { namespace, service, podName, } = req.body;
+    const { service, deployment, namespace, } = req.body;
 
-    if (!namespace || !podName) {
-      return res.status(400).json({ error: "logs and podName are required" });
+    if (!namespace || !deployment) {
+      return res.status(400).json({ error: "deployemnt and namespace are required" });
     }
 
     const result = await IncidentService.analyze({
-      namespace,
       service,
-      podName,
+      deployment,
+      namespace,
     });
 
     return res.json(result);

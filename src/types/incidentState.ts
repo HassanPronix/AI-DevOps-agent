@@ -31,7 +31,7 @@ export const IncidentStateAnnotation = Annotation.Root({
         default: () => "",
     }),
 
-    podName: Annotation<string>({
+    deployment: Annotation<string>({
         value: (x, y) => y,
         default: () => "",
     }),
