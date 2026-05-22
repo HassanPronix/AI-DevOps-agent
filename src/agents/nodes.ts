@@ -38,12 +38,33 @@ export async function retrieveIncidentsNode(state: IncidentState) {
 }
 export async function reasoningNode(state: IncidentState): Promise<Partial<IncidentState>> {
 
-    const prompt = `You are a Kubernetes SRE expert. Analyze these logs:${state.logs} Past incidents: ${JSON.stringify(state.retrievedIncidents)}
+    // const prompt = `You are a Kubernetes SRE expert. Analyze these logs:${state.logs} Past incidents: ${JSON.stringify(state.retrievedIncidents)}
 
-        Give:
-        1. probable root causes
-        2. ranked hypotheses
-        `;
+    //     Give:
+    //     1. probable root causes
+    //     2. ranked hypotheses
+    //     `;
+
+    const prompt = `
+                You are an expert Kubernetes SRE.
+                
+                Analyze:
+                
+                LOGS:
+                ${state.logs}
+                
+                CLUSTER CONTEXT:
+                ${JSON.stringify(state.clusterContext)}
+                
+                SIMILAR INCIDENTS:
+                ${JSON.stringify(state.retrievedIncidents)}
+                
+                Provide:
+                1. Root cause hypotheses
+                2. Severity
+                3. Recommended investigation
+                4. Most likely fix
+                `;
 
     const response = await llm.invoke(prompt);
 

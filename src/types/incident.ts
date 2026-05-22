@@ -23,6 +23,8 @@ export const IncidentAnnotation = Annotation.Root({
   }),
 
   finalReport: Annotation<string>(),
+
+  clusterContext: Annotation<any>(),
 });
 
 export type IncidentState = typeof IncidentAnnotation.State;

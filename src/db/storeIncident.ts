@@ -9,6 +9,7 @@ type StoreIncidentInput = {
 };
 
 export async function storeIncident(data: StoreIncidentInput) {
+    
     const collection = await getIncidentCollection();
 
     const embedding = await embeddings.embedQuery(data.logs);
