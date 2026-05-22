@@ -1,27 +1,42 @@
-import { embeddings } from "./embeddings";
-import { getIncidentCollection } from "./incidentCollection";
 import crypto from "crypto";
 
+import { embeddings } from "./embeddings";
+
+import { getIncidentCollection }
+    from "./incidentCollection";
+
+import { buildIncidentDocument }
+    from "./buildIncidentDocument";
+
 type StoreIncidentInput = {
-    logs: string;
+    logs?: string;
     service?: string;
-    resolution?: string;
+    hypotheses?: string[];
+    fixPlan?: string[];
 };
 
-export async function storeIncident(data: StoreIncidentInput) {
-    
-    const collection = await getIncidentCollection();
+export async function storeIncident(
+    data: StoreIncidentInput
+) {
+    const collection =
+        await getIncidentCollection();
 
-    const embedding = await embeddings.embedQuery(data.logs);
+    const document =
+        buildIncidentDocument(data);
+
+    const embedding =
+        await embeddings.embedQuery(document);
 
     await collection.add({
         ids: [crypto.randomUUID()],
+
         embeddings: [embedding],
-        documents: [data.logs],
+
+        documents: [document],
+
         metadatas: [
             {
                 service: data.service || "unknown",
-                resolution: data.resolution || "",
             },
         ],
     });

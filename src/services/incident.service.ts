@@ -67,8 +67,9 @@ import { buildIncidentGraph } from "../agents/graph";
 import { storeIncident } from "../db/storeIncident";
 
 type IncidentInput = {
-  logs: string;
+  namespace?: string;
   service?: string;
+  podName?: string;
 };
 export class IncidentService {
 
@@ -77,14 +78,16 @@ export class IncidentService {
     const graph = await buildIncidentGraph();
 
     const result = await graph.invoke({
-      logs: input.logs,
+      namespace: input.service,
       service: input.service,
+      podName: input.podName
     });
 
     await storeIncident({
-      logs: input.logs,
-      service: input.service,
-      resolution: result.fixPlan?.join("\n"),
+      logs: result.logs,
+      service: result.service,
+      hypotheses: result.hypotheses,
+      fixPlan: result.fixPlan,
     });
 
     return result;

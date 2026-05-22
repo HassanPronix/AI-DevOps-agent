@@ -8,6 +8,7 @@ import {
   reasoningNode,
   fixPlannerNode,
   reportNode,
+  fetchLogsNode,
 } from "./nodes";
 import { k8sInspectionNode } from "./k8sNode";
 
@@ -15,6 +16,8 @@ export async function buildIncidentGraph() {
   const workflow = new StateGraph(IncidentAnnotation)
 
     .addNode("parseLogs", parseLogsNode)
+
+    .addNode("fetchLogs", fetchLogsNode)
 
     .addNode("k8sInspection", k8sInspectionNode)
 
@@ -26,7 +29,9 @@ export async function buildIncidentGraph() {
 
     .addNode("report", reportNode)
 
-    .addEdge(START, "parseLogs")
+    .addEdge(START, "fetchLogs")
+
+    .addEdge("fetchLogs", "parseLogs")
 
     .addEdge("parseLogs", "k8sInspection")
 

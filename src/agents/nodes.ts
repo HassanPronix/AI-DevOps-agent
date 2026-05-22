@@ -2,6 +2,7 @@ import type { IncidentState } from "../types/incident";
 import { llm } from "./llm";
 import { embeddings } from "../db/embeddings";
 import { getIncidentCollection } from "../db/incidentCollection";
+import { getPodLogs } from "../k8s/tools";
 
 export async function parseLogsNode(state: IncidentState) {
     const errorLines = state.logs
@@ -16,26 +17,54 @@ export async function parseLogsNode(state: IncidentState) {
     };
 }
 
+// export async function retrieveIncidentsNode(state: IncidentState) {
+//     const collection = await getIncidentCollection();
+
+//     const queryEmbedding = await embeddings.embedQuery(state.logs);
+
+//     const results = await collection.query({
+//         queryEmbeddings: [queryEmbedding],
+//         nResults: 3,
+//     });
+
+//     const incidents =
+//         results.documents?.[0]?.map((doc, idx) => ({
+//             log: doc,
+//             metadata: results.metadatas?.[0]?.[idx],
+//         })) || [];
+
+//     return {
+//         retrievedIncidents: incidents,
+//     };
+// }
+
 export async function retrieveIncidentsNode(state: IncidentState) {
-    const collection = await getIncidentCollection();
+    const collection =
+        await getIncidentCollection();
 
-    const queryEmbedding = await embeddings.embedQuery(state.logs);
+    const queryEmbedding =
+        await embeddings.embedQuery(state.logs);
 
-    const results = await collection.query({
-        queryEmbeddings: [queryEmbedding],
-        nResults: 3,
-    });
+    const results =
+        await collection.query({
+            queryEmbeddings: [queryEmbedding],
+            nResults: 3,
+        });
 
     const incidents =
-        results.documents?.[0]?.map((doc, idx) => ({
-            log: doc,
-            metadata: results.metadatas?.[0]?.[idx],
-        })) || [];
+        results.documents?.[0]?.map(
+            (doc, idx) => ({
+                document: doc,
+                metadata:
+                    results.metadatas?.[0]?.[idx],
+            })
+        ) || [];
 
     return {
         retrievedIncidents: incidents,
     };
 }
+
 export async function reasoningNode(state: IncidentState): Promise<Partial<IncidentState>> {
 
     // const prompt = `You are a Kubernetes SRE expert. Analyze these logs:${state.logs} Past incidents: ${JSON.stringify(state.retrievedIncidents)}
@@ -112,5 +141,14 @@ export async function reportNode(state: IncidentState): Promise<Partial<Incident
 
     return {
         finalReport: report,
+    };
+}
+
+export async function fetchLogsNode(state: IncidentState) {
+
+    const logs = await getPodLogs(state.podName, state.namespace);
+
+    return {
+        logs,
     };
 }

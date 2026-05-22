@@ -7,9 +7,10 @@ import {
 
 export async function k8sInspectionNode(state: IncidentState) {
    
-    const pods = await getPods("default");
+    console.log(state)
+    const pods = await getPods(state.namespace);
 
-    const events = await getEvents("default");
+    const events = await getEvents(state.namespace);
 
     return {
         clusterContext: {
